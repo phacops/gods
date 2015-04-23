@@ -31,6 +31,16 @@ add new informational panels, remove others, change the ordering or formating.
 With a custom font you can use own icons and separators and through the
 statuscolors patch config in dwm you can change the colors.
 
+##Contributing
+
+This repository is meant as an example of how to draw your dwm status bar with
+go, as I use it. No additional features will be merged from pull-requests, but
+you can tell me about your fork and changes and then I can link them here as
+further examples for other people to look at.
+
+- [phacops forked](https://github.com/phacops/gods) gods to not use a custom
+  font, but rather replace the icons with plain text.
+
 ##License
 
 "THE BEER-WARE LICENSE" (Revision 42):
