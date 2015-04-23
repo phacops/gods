@@ -23,8 +23,6 @@ import (
 )
 
 const (
-	netDev = "wlp4s0"
-
 	bpsSign   = "B/s"
 	kibpsSign = "KiB/s"
 	mibpsSign = "MiB/s"
@@ -44,6 +42,10 @@ const (
 )
 
 var (
+	netDevs = map[string]struct{}{
+		"enp0s25:": {},
+		"wlp4s0:":  {},
+	}
 	cores = runtime.NumCPU() // count of cores to scale cpu usage
 	rxOld = 0
 	txOld = 0
@@ -79,7 +81,6 @@ func fixed(pre string, rate int) string {
 	} else {
 		formated = fmt.Sprintf(" %3.1f", spd)
 	}
-
 	return pre + strings.Replace(formated, ".", floatSeparator, 1) + suf
 }
 
@@ -99,9 +100,7 @@ func updateNetUse() string {
 	for scanner.Scan() {
 		_, err = fmt.Sscanf(scanner.Text(), "%s %d %d %d %d %d %d %d %d %d",
 			&dev, &rx, &void, &void, &void, &void, &void, &void, &void, &tx)
-
-		switch dev { // ignore devices like tun, tap, lo, ...
-		case "ppp0:", "eth1:", "wlan0:", netDev + ":":
+		if _, ok := netDevs[dev]; ok {
 			rxNow += rx
 			txNow += tx
 		}
@@ -168,7 +167,6 @@ func updatePower() string {
 
 	enPerc = enNow * 100 / enFull
 	var icon = unpluggedSign
-
 	if string(plugged) == "1\n" {
 		icon = pluggedSign
 	}
@@ -195,7 +193,6 @@ func updateCPUUse() string {
 	if err != nil {
 		return cpuSign + "ERR"
 	}
-
 	return colored(cpuSign, int(load*100.0/float32(cores)))
 }
 
@@ -253,7 +250,6 @@ func main() {
 			updatePower(),
 			time.Now().Local().Format("Mon 02 " + dateSeparator + " 15:04:05"),
 		}
-
 		exec.Command("xsetroot", "-name", strings.Join(status, fieldSeparator)).Run()
 
 		// sleep until beginning of next second
