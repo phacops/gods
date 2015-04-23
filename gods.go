@@ -23,24 +23,24 @@ import (
 )
 
 const (
-	netDev = "eth0"
+	netDev = "wlp4s0"
 
-	bpsSign   = "á"
-	kibpsSign = "â"
-	mibpsSign = "ã"
+	bpsSign   = "B/s"
+	kibpsSign = "KiB/s"
+	mibpsSign = "MiB/s"
 
-	unpluggedSign = "è"
-	pluggedSign   = "é"
+	unpluggedSign = "BAT"
+	pluggedSign   = "AC"
 
-	cpuSign = "Ï"
-	memSign = "Þ"
+	cpuSign = "CPU"
+	memSign = "MEM"
 
-	netReceivedSign    = "Ð"
-	netTransmittedSign = "Ñ"
+	netReceivedSign    = "RX"
+	netTransmittedSign = "TX"
 
-	floatSeparator = "à"
-	dateSeparator  = "Ý"
-	fieldSeparator = "û"
+	floatSeparator = "."
+	dateSeparator  = "|"
+	fieldSeparator = " | "
 )
 
 var (
