@@ -166,9 +166,10 @@ func updatePower() string {
 	}
 
 	enPerc = enNow * 100 / enFull
-	var icon = unpluggedSign
-	var timeRemaining = ""
-	if string(plugged) == "1\n" {
+	icon := unpluggedSign
+	timeRemaining := ""
+
+	if plugged[0] == '1' {
 		icon = pluggedSign
 	} else if curNow != 0 {
 		remaining := float32(enNow) / float32(curNow)
