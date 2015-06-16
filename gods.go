@@ -133,9 +133,9 @@ func updatePower() string {
 		return "ÏERR"
 	}
 
-	readval := func(name string, field[] string) int {
+	readval := func(name string, field []string) int {
 		var path = powerSupply + name + "/"
-		var file []byte = []byte{ '0', }
+		var file []byte = []byte{'0'}
 		for _, f := range field {
 			if tmp, err := ioutil.ReadFile(path + f); err == nil {
 				file = tmp
@@ -170,13 +170,13 @@ func updatePower() string {
 	var timeRemaining = ""
 	if string(plugged) == "1\n" {
 		icon = pluggedSign
-	} else if (curNow != 0) {
-		remaining :=  float32(enNow) / float32(curNow)
+	} else if curNow != 0 {
+		remaining := float32(enNow) / float32(curNow)
 		time_in_min := int(remaining * 60)
 		hours := time_in_min / 60
 		time_in_min -= hours * 60
 
-		timeRemaining =  fmt.Sprintf(" [%d:%02d]", hours, time_in_min)
+		timeRemaining = fmt.Sprintf(" [%d:%02d]", hours, time_in_min)
 	}
 
 	if enPerc <= 5 {
