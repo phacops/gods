@@ -158,7 +158,7 @@ func updatePower() string {
 
 		enFull += readval(name, []string{"energy_full", "charge_full"})
 		enNow += readval(name, []string{"energy_now", "charge_now"})
-		curNow += readval(name, []string{"current_now"})
+		curNow += readval(name, []string{"current_now", "power_now"})
 	}
 
 	if enFull == 0 { // Battery found but no readable full file.
