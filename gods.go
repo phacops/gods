@@ -123,7 +123,7 @@ func colored(icon string, percentage int) string {
 // updatePower reads the current battery and power plug status
 func updatePower() string {
 	const powerSupply = "/sys/class/power_supply/"
-	var enFull, enNow, enPerc int = 0, 0, 0
+	var enFull, enNow, enPerc, curNow int = 0, 0, 0, 0
 	var plugged, err = ioutil.ReadFile(powerSupply + "AC/online")
 	if err != nil {
 		return "ÏERR"
@@ -158,6 +158,7 @@ func updatePower() string {
 
 		enFull += readval(name, []string{"energy_full", "charge_full"})
 		enNow += readval(name, []string{"energy_now", "charge_now"})
+		curNow += readval(name, []string{"current_now"})
 	}
 
 	if enFull == 0 { // Battery found but no readable full file.
@@ -166,16 +167,24 @@ func updatePower() string {
 
 	enPerc = enNow * 100 / enFull
 	var icon = unpluggedSign
+	var timeRemaining = ""
 	if string(plugged) == "1\n" {
 		icon = pluggedSign
+	} else if (curNow != 0) {
+		remaining :=  float32(enNow) / float32(curNow)
+		time_in_min := int(remaining * 60)
+		hours := time_in_min / 60
+		time_in_min -= hours * 60
+
+		timeRemaining =  fmt.Sprintf(" [%d:%02d]", hours, time_in_min)
 	}
 
 	if enPerc <= 5 {
-		return fmt.Sprintf("%s%3d", icon, enPerc)
+		return fmt.Sprintf("%s %3d%s", icon, enPerc, timeRemaining)
 	} else if enPerc <= 10 {
-		return fmt.Sprintf("%s%3d", icon, enPerc)
+		return fmt.Sprintf("%s %3d%s", icon, enPerc, timeRemaining)
 	}
-	return fmt.Sprintf("%s%3d", icon, enPerc)
+	return fmt.Sprintf("%s %3d%s", icon, enPerc, timeRemaining)
 }
 
 // updateCPUUse reads the last minute sysload and scales it to the core count
