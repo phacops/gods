@@ -133,15 +133,14 @@ func updatePower() string {
 		return "ÏERR"
 	}
 
-	readval := func(name, field string) int {
+	readval := func(name string, field[] string) int {
 		var path = powerSupply + name + "/"
-		var file []byte
-		if tmp, err := ioutil.ReadFile(path + "energy_" + field); err == nil {
-			file = tmp
-		} else if tmp, err := ioutil.ReadFile(path + "charge_" + field); err == nil {
-			file = tmp
-		} else {
-			return 0
+		var file []byte = []byte{ '0', }
+		for _, f := range field {
+			if tmp, err := ioutil.ReadFile(path + f); err == nil {
+				file = tmp
+				break
+			}
 		}
 
 		if ret, err := strconv.Atoi(strings.TrimSpace(string(file))); err == nil {
@@ -157,8 +156,8 @@ func updatePower() string {
 			continue
 		}
 
-		enFull += readval(name, "full")
-		enNow += readval(name, "now")
+		enFull += readval(name, []string{"energy_full", "charge_full"})
+		enNow += readval(name, []string{"energy_now", "charge_now"})
 	}
 
 	if enFull == 0 { // Battery found but no readable full file.
