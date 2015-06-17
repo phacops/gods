@@ -17,7 +17,6 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -125,28 +124,14 @@ func updatePower() string {
 	const powerSupply = "/sys/class/power_supply/"
 	var enFull, enNow, enPerc, curNow int = 0, 0, 0, 0
 	var plugged, err = ioutil.ReadFile(powerSupply + "AC/online")
+
 	if err != nil {
 		return "ÏERR"
 	}
 	batts, err := ioutil.ReadDir(powerSupply)
+
 	if err != nil {
 		return "ÏERR"
-	}
-
-	readval := func(name string, field []string) int {
-		var path = powerSupply + name + "/"
-		var file []byte = []byte{'0'}
-		for _, f := range field {
-			if tmp, err := ioutil.ReadFile(path + f); err == nil {
-				file = tmp
-				break
-			}
-		}
-
-		if ret, err := strconv.Atoi(strings.TrimSpace(string(file))); err == nil {
-			return ret
-		}
-		return 0
 	}
 
 	for _, batt := range batts {
@@ -156,9 +141,11 @@ func updatePower() string {
 			continue
 		}
 
-		enFull += readval(name, []string{"energy_full", "charge_full"})
-		enNow += readval(name, []string{"energy_now", "charge_now"})
-		curNow += readval(name, []string{"current_now", "power_now"})
+		batteryValues := parseFile(powerSupply + batt.Name() + "/uevent")
+
+		enFull += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_FULL", "POWER_SUPPLY_CHARGE_FULL"})
+		enNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_NOW", "POWER_SUPPLY_CHARGE_NOW"})
+		curNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_CURRENT_NOW", "POWER_SUPPLY_ENERGY_NOW"})
 	}
 
 	if enFull == 0 { // Battery found but no readable full file.
@@ -185,6 +172,7 @@ func updatePower() string {
 	} else if enPerc <= 10 {
 		return fmt.Sprintf("%s %3d%s", icon, enPerc, timeRemaining)
 	}
+
 	return fmt.Sprintf("%s %3d%s", icon, enPerc, timeRemaining)
 }
 
