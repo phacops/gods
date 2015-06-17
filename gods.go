@@ -23,10 +23,6 @@ import (
 )
 
 const (
-	bpsSign   = "B/s"
-	kibpsSign = "KiB/s"
-	mibpsSign = "MiB/s"
-
 	unpluggedSign = "BAT"
 	pluggedSign   = "AC"
 
@@ -51,39 +47,6 @@ var (
 	txOld = 0
 )
 
-// fixed builds a fixed width string with given pre- and fitting suffix
-func fixed(pre string, rate int) string {
-	if rate < 0 {
-		return pre + " ERR"
-	}
-
-	var spd = float32(rate)
-	var suf = bpsSign // default: display as B/s
-
-	switch {
-	case spd >= (1000 * 1024 * 1024): // > 999 MiB/s
-		return "" + pre + "ERR"
-	case spd >= (1000 * 1024): // display as MiB/s
-		spd /= (1024 * 1024)
-		suf = mibpsSign
-		pre = "" + pre + ""
-	case spd >= 1000: // display as KiB/s
-		spd /= 1024
-		suf = kibpsSign
-	}
-
-	var formated = ""
-
-	if spd >= 100 {
-		formated = fmt.Sprintf("%3.0f", spd)
-	} else if spd >= 10 {
-		formated = fmt.Sprintf("%4.1f", spd)
-	} else {
-		formated = fmt.Sprintf(" %3.1f", spd)
-	}
-	return pre + strings.Replace(formated, ".", floatSeparator, 1) + suf
-}
-
 // updateNetUse reads current transfer rates of certain network interfaces
 func updateNetUse() string {
 	file, err := os.Open("/proc/net/dev")
@@ -91,6 +54,7 @@ func updateNetUse() string {
 	if err != nil {
 		return netReceivedSign + " ERR " + netTransmittedSign + " ERR"
 	}
+
 	defer file.Close()
 
 	var void = 0 // target for unused values
@@ -98,8 +62,12 @@ func updateNetUse() string {
 	var scanner = bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		_, err = fmt.Sscanf(scanner.Text(), "%s %d %d %d %d %d %d %d %d %d",
-			&dev, &rx, &void, &void, &void, &void, &void, &void, &void, &tx)
+		_, err = fmt.Sscanf(
+			scanner.Text(),
+			"%s %d %d %d %d %d %d %d %d %d",
+			&dev, &rx, &void, &void, &void, &void, &void, &void, &void, &tx,
+		)
+
 		if _, ok := netDevs[dev]; ok {
 			rxNow += rx
 			txNow += tx
@@ -107,7 +75,18 @@ func updateNetUse() string {
 	}
 
 	defer func() { rxOld, txOld = rxNow, txNow }()
-	return fmt.Sprintf("%s %s", fixed(netReceivedSign, rxNow-rxOld), fixed(netTransmittedSign, txNow-txOld))
+
+	var download, upload string = " ", " "
+
+	if rxNow-rxOld != 0.0 {
+		download = "↓"
+	}
+
+	if txNow-txOld != 0.0 {
+		upload = "↑"
+	}
+
+	return fmt.Sprintf("%s %s %s %s", netReceivedSign, download, netTransmittedSign, upload)
 }
 
 // colored surrounds the percentage with color escapes if it is >= 70
