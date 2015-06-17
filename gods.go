@@ -28,9 +28,7 @@ const (
 
 	cpuSign = "CPU"
 	memSign = "MEM"
-
-	netReceivedSign    = "RX"
-	netTransmittedSign = "TX"
+	netSign = "NET"
 
 	floatSeparator = "."
 	dateSeparator  = "|"
@@ -52,7 +50,7 @@ func updateNetUse() string {
 	file, err := os.Open("/proc/net/dev")
 
 	if err != nil {
-		return netReceivedSign + " ERR " + netTransmittedSign + " ERR"
+		return netSign + " ERR"
 	}
 
 	defer file.Close()
@@ -86,7 +84,7 @@ func updateNetUse() string {
 		upload = "↑"
 	}
 
-	return fmt.Sprintf("%s %s %s %s", netReceivedSign, download, netTransmittedSign, upload)
+	return fmt.Sprintf("%s %s %s", netSign, download, upload)
 }
 
 // colored surrounds the percentage with color escapes if it is >= 70
