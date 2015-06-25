@@ -98,13 +98,14 @@ func colored(icon string, percentage int) string {
 
 // updatePower reads the current battery and power plug status
 func updatePower() string {
-	const powerSupply = "/sys/class/power_supply/"
+	const powerSupply = "/sys/class/power_supply"
 	var enFull, enNow, enPerc, curNow int = 0, 0, 0, 0
-	var plugged, err = ioutil.ReadFile(powerSupply + "AC/online")
+	var plugged, err = ioutil.ReadFile(powerSupply + "/AC/online")
 
 	if err != nil {
 		return "ÏERR"
 	}
+
 	batts, err := ioutil.ReadDir(powerSupply)
 
 	if err != nil {
@@ -118,11 +119,11 @@ func updatePower() string {
 			continue
 		}
 
-		batteryValues := parseFile(powerSupply + batt.Name() + "/uevent")
+		batteryValues := parseFile(powerSupply + "/" + batt.Name() + "/uevent")
 
 		enFull += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_FULL", "POWER_SUPPLY_CHARGE_FULL"})
-		enNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_NOW", "POWER_SUPPLY_CHARGE_NOW"})
-		curNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_CURRENT_NOW", "POWER_SUPPLY_ENERGY_NOW"})
+		enNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_NOW", "POWR_SUPPLY_CHARGE_NOW"})
+		curNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_CURRENT_NOW", "POWER_SUPPLY_POWER_NOW"})
 	}
 
 	if enFull == 0 { // Battery found but no readable full file.
