@@ -83,7 +83,7 @@ func updateNetUse() string {
 		upload = "↑"
 	}
 
-	return fmt.Sprintf("%s %s %s", netSign, download, upload)
+	return fmt.Sprintf("%s %s%s", netSign, download, upload)
 }
 
 // colored surrounds the percentage with color escapes if it is >= 70
