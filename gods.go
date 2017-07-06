@@ -122,7 +122,7 @@ func updatePower() string {
 		batteryValues := parseFile(powerSupply + "/" + batt.Name() + "/uevent")
 
 		enFull += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_FULL", "POWER_SUPPLY_CHARGE_FULL"})
-		enNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_NOW", "POWR_SUPPLY_CHARGE_NOW"})
+		enNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_ENERGY_NOW", "POWER_SUPPLY_CHARGE_NOW"})
 		curNow += batteryValues.SearchForInt([]string{"POWER_SUPPLY_CURRENT_NOW", "POWER_SUPPLY_POWER_NOW"})
 	}
 
